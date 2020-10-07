@@ -17,11 +17,11 @@ namespace BetterPractice.BetterMvvm.ViewModels
             _choices = new List<T>();
         }
 
-        private string? _header;
-        public string? Header
+        private string? _label;
+        public string? Label
         {
-            get => _header;
-            set => SetProperty(ref _header, value);
+            get => _label;
+            set => SetProperty(ref _label, value);
         }
 
         private string? _description;

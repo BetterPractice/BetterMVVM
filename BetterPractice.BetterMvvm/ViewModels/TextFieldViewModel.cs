@@ -48,6 +48,13 @@ namespace BetterPractice.BetterMvvm.ViewModels
             set => SetProperty(ref _placeholder, value);
         }
 
+        private string? _label;
+        public string? Label
+        {
+            get => _label;
+            set => SetProperty(ref _label, value);
+        }
+
         private string? _description;
         public string? Description
         {
@@ -105,8 +112,6 @@ namespace BetterPractice.BetterMvvm.ViewModels
 
             ValidationErrorMessage = null;
             IsValid = true;
-
-
         }
     }
 }
