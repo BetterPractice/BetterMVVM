@@ -12,6 +12,13 @@ namespace BetterPractice.BetterMvvm.ViewModels
             set => SetProperty(ref _isValid, value);
         }
 
+        private string? _validationErrorMessage;
+        public string? ValidationErrorMessage
+        {
+            get => _validationErrorMessage;
+            set => SetProperty(ref _validationErrorMessage, value);
+        }
+
         public SingleSelectViewModel()
         {
             _choices = new List<T>();
@@ -57,10 +64,16 @@ namespace BetterPractice.BetterMvvm.ViewModels
             set => SetProperty(ref _footnote, value);
         }
 
+        private bool _isNullInvalid = true;
+        public bool IsNullInvalid
+        {
+            get => _isNullInvalid;
+            set => SetProperty(ref _isNullInvalid, value);
+        }
 
         protected virtual void OnSelectionChanged(T? oldValue)
         {
-            IsValid = Selected != null;
+            IsValid = !IsNullInvalid || Selected != null;
         }
     }
 }

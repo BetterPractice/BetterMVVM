@@ -13,17 +13,13 @@ namespace BetterPractice.BetterMvvm.ViewModels.TextValidators
             MaximumLength = max;
         }
 
-        public virtual string GetMinLengthError(int actualLength) => $"Please enter at least {MinimumLength} characters.";
-        public virtual string GetMaxLengthError(int actualLength) => $"Please enter less than {MaximumLength} characters.";
+        public int ActualLength { get; private set; }
 
-        public string? Validate(string? text)
+        public bool Validate(string? text)
         {
             var length = text?.Length ?? 0;
-            if (length < MinimumLength)
-                return GetMinLengthError(length);
-            if (length > MaximumLength)
-                return GetMaxLengthError(length);
-            return null;
+            ActualLength = length;
+            return length >= MinimumLength && length <= MaximumLength;
         }
     }
 }

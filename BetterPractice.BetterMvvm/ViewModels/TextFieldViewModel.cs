@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using Xamarin.Forms;
 using BetterPractice.BetterMvvm.ViewModels.TextMasks;
 using BetterPractice.BetterMvvm.ViewModels.TextValidators;
+using System.Linq;
 
 namespace BetterPractice.BetterMvvm.ViewModels
 {
     public class TextFieldViewModel : ObservableObject, IValidated
     {
+        public class ValidationCompleteArgs
+        {
+            public string? OldValue { get; set; }
+            public string? NewValue { get; set; }
+            public IEnumerable<ITextValidator>? FailedValidators { get; set; }
+        }
+
+        public delegate void ValidationCompleteHandler(TextFieldViewModel sender, ValidationCompleteArgs args);
+
         private bool _isValid;
         public bool IsValid
         {
@@ -83,6 +93,8 @@ namespace BetterPractice.BetterMvvm.ViewModels
             set => SetProperty(ref _validators, value);
         }
 
+        public event ValidationCompleteHandler? ValidationComplete;
+
         protected virtual void OnTextChanged(string? oldValue)
         {
             if (oldValue == Text)
@@ -99,19 +111,15 @@ namespace BetterPractice.BetterMvvm.ViewModels
                 Text = transformed;
             }
 
-            foreach (var validator in Validators)
+            var failedValidators = Validators.Where(v => v.Validate(Text));
+            IsValid = failedValidators.Any();
+            var args = new ValidationCompleteArgs
             {
-                var msg = validator.Validate(Text);
-                if (msg != null)
-                {
-                    ValidationErrorMessage = msg;
-                    IsValid = false;
-                    return;
-                }
-            }
-
-            ValidationErrorMessage = null;
-            IsValid = true;
+                OldValue = oldValue,
+                NewValue = Text,
+                FailedValidators = failedValidators,
+            };
+            ValidationComplete?.Invoke(this, args);
         }
     }
 }
