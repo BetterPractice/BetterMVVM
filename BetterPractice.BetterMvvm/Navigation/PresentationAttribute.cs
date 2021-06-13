@@ -13,7 +13,7 @@ namespace BetterPractice.BetterMvvm.Navigation
 
         public Type NavPageType { get; set; }
 
-        public Page? MainPage
+        protected Page? MainPage
         {
             get => Application.Current.MainPage;
             set => Application.Current.MainPage = value;
@@ -29,27 +29,49 @@ namespace BetterPractice.BetterMvvm.Navigation
             NavPageType = DefaultNavPageType;
         }
 
-        public virtual Task ShowPage(Page page)
+        public virtual async Task ShowPage(Page page)
         {
             if (MainPage == null)
             {
-                MainPage = WrapIfNeeded(page);
-                return Task.CompletedTask;
+                MainPage = new Pages.FadeNavigationMultiPage(WrapIfNeeded(page));
+                return;
             }
-            if (TopPage is NavigationPage navPage)
-                return navPage.PushAsync(page);
-            if (TopPage is TabbedPage tabbedPage)
+
+            var handled = await ShowPage(page, TopPage!);
+
+            if (!handled)
+            {
+                await TopPage!.Navigation.PushModalAsync(WrapIfNeeded(page));
+            }
+        }
+
+        protected virtual Task<bool> ShowPage(Page page, Page fromPage)
+        {
+            if (fromPage is NavigationPage navPage)
+            {
+                return navPage.PushAsync(page)
+                    .ContinueWith(_ => true);
+            }
+            if (fromPage is TabbedPage tabbedPage)
             {
                 if (tabbedPage.CurrentPage == null)
                 {
-                    tabbedPage.Children.Add(page);
-                    return Task.CompletedTask;
+                    tabbedPage.Children.Add(WrapIfNeeded(page));
+                    return Task.FromResult(true);
                 }
-                if (tabbedPage.CurrentPage is NavigationPage tabNavPage)
-                    return tabNavPage.PushAsync(page);
-                return tabbedPage.Navigation.PushModalAsync(WrapIfNeeded(page));
+                return ShowPage(page, tabbedPage.CurrentPage);
             }
-            return TopPage!.Navigation.PushModalAsync(WrapIfNeeded(page));
+            if (fromPage is Pages.FadeNavigationMultiPage fadeNav)
+            {
+                if (fadeNav.CurrentPage == null)
+                    return fadeNav.TransitionTo(WrapIfNeeded(page))
+                        .ContinueWith(_ => true);
+                else
+                {
+                    return ShowPage(page, fadeNav.CurrentPage);
+                }
+            }
+            return Task.FromResult(false);
         }
 
         public virtual Task DismissPage(Page page)
@@ -71,13 +93,17 @@ namespace BetterPractice.BetterMvvm.Navigation
                 tabbedPage.Children.Remove(page);
                 return Task.CompletedTask;
             }
+            if (parent is Pages.FadeNavigationMultiPage)
+            {
+                return DismissPage(parent);
+            }
             if (parent == null)
             {
                 if (page == MainPage)
                     DismissRoot();
                 if (page == TopPage)
                     return page.Navigation.PopModalAsync();
-                throw new InvalidNavigationException("Cannod dismiss dialog that isn't on top.");
+                throw new InvalidNavigationException("Cannot dismiss dialog that isn't on top.");
             }
             return DismissPage(parent);
         }

@@ -111,7 +111,7 @@ namespace BetterPractice.BetterMvvm.ViewModels
                 Text = transformed;
             }
 
-            var failedValidators = Validators.Where(v => v.Validate(Text));
+            var failedValidators = Validators.Where(v => !v.Validate(Text));
             IsValid = failedValidators.Any();
             var args = new ValidationCompleteArgs
             {

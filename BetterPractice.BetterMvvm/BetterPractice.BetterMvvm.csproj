@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <ReleaseVersion>2.3.1</ReleaseVersion>
     </PropertyGroup>
     <PropertyGroup>
         <LangVersion>8.0</LangVersion>
@@ -17,11 +18,16 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Xamarin.Forms" Version="4.8.0.1451" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Extensions\" />
       <Folder Include="ViewModels\TextMasks\" />
       <Folder Include="ViewModels\TextValidators\" />
       <Folder Include="ValueConverters\" />
+      <Folder Include="Controls\" />
+      <Folder Include="Controls\Labels\" />
+      <Folder Include="Pages\" />
+      <Folder Include="Services\" />
     </ItemGroup>
 </Project>

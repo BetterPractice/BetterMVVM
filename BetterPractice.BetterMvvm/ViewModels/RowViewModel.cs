@@ -1,4 +1,6 @@
 ﻿using System;
+using Xamarin.Forms;
+
 namespace BetterPractice.BetterMvvm.ViewModels
 {
     public class RowViewModel : ObservableObject
@@ -29,6 +31,13 @@ namespace BetterPractice.BetterMvvm.ViewModels
         {
             get => _tertiaryText;
             set => SetProperty(ref _tertiaryText, value);
+        }
+
+        private ImageSource? _image;
+        public ImageSource? Image
+        {
+            get => _image;
+            set => SetProperty(ref _image, value);
         }
     }
 }

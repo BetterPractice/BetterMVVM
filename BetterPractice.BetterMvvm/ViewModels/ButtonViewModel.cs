@@ -42,18 +42,28 @@ namespace BetterPractice.BetterMvvm.ViewModels
             _isEnabled = isEnabled;
         }
 
-        private ICommand _command;
+        private Command _command;
         public ICommand Command
         {
-            get => _command;
-            set => SetProperty(ref _command, value);
+            get => _command;            
         }
 
         private bool _isEnabled;
         public bool IsEnabled
         {
             get => _isEnabled;
-            set => SetProperty(ref _isEnabled, value);
+            set
+            {
+                if (SetProperty(ref _isEnabled, value))
+                    _command.ChangeCanExecute();
+            }
+        }
+
+        private bool _isVisible = true;
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set => SetProperty(ref _isVisible, value);
         }
 
         private string? _title;

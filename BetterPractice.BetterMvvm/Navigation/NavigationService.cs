@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using BetterPractice.BetterMvvm.ViewModels;
 
@@ -51,6 +52,11 @@ namespace BetterPractice.BetterMvvm.Navigation
 
         private Task NavigateInternal<TPageModel>(Func<Page, IPresenter> findPresenter, Action<TPageModel>? postCreate = null) where TPageModel : PageModel
         {
+            if (!MainThread.IsMainThread)
+            {
+                return MainThread.InvokeOnMainThreadAsync(() => NavigateInternal<TPageModel>(findPresenter, postCreate));
+            }
+
             var tasks = new List<Task>();
             var (page, pageModel) = PageModelMapper.CreatePage<TPageModel>();
             var presenter = findPresenter(page);
@@ -68,6 +74,11 @@ namespace BetterPractice.BetterMvvm.Navigation
 
         private Task CloseInternal(PageModel pageModel, Func<Page, IDismisser> findDismisser)
         {
+            if (!MainThread.IsMainThread)
+            {
+                return MainThread.InvokeOnMainThreadAsync(() => CloseInternal(pageModel, findDismisser));
+            }
+
             var page = FindPage(pageModel);
             if (page == null)
                 return Task.CompletedTask;
@@ -117,6 +128,10 @@ namespace BetterPractice.BetterMvvm.Navigation
                 return page;
             if (page is NavigationPage navPage)
                 return navPage.Navigation.NavigationStack
+                    .Select(p => FindPage(pageModel, p))
+                    .FirstOrDefault(p => p != null);
+            if (page is MultiPage<Page> multiPage)
+                return multiPage.Children
                     .Select(p => FindPage(pageModel, p))
                     .FirstOrDefault(p => p != null);
             if (page is TabbedPage tabbedPage)

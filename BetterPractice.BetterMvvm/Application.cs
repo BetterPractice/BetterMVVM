@@ -22,18 +22,18 @@ namespace BetterPractice.BetterMvvm
             NavigationService = new NavigationService(PageModelMapper);
             RegisterServices();
             RegisterPageModelMappings();
-            InitialNavigation(Container.Resolve<INavigationService>());
         }
 
         protected override void OnStart()
         {
-            base.OnStart();
+            InitialNavigation(Container.Resolve<INavigationService>());
         }
 
         protected virtual void RegisterServices()
         {
             Container.RegisterSingleton(PageModelMapper);
             Container.RegisterSingleton(NavigationService);
+            Container.RegisterTransient<Services.IAlertService, Services.DefaultAlertService>();
         }
 
         protected virtual void RegisterPageModelMappings()
@@ -42,6 +42,6 @@ namespace BetterPractice.BetterMvvm
         }
 
         protected abstract Task InitialNavigation(INavigationService navigationService);
-        
+
     }
 }

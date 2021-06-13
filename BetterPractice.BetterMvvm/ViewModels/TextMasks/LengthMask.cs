@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using BetterPractice.BetterMvvm.Extensions;
 
 namespace BetterPractice.BetterMvvm.ViewModels.TextMasks
 {
@@ -13,7 +15,7 @@ namespace BetterPractice.BetterMvvm.ViewModels.TextMasks
 
         public string? Transform(string? newValue, string? oldValue)
         {
-            return newValue?.Substring(0, MaximumLength);
+            return newValue?.Take(MaximumLength).Implode();
         }
     }
 }
